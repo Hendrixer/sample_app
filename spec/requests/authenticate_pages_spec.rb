@@ -44,8 +44,14 @@ describe "Authentication" do
 
     describe "with valid information" do
       let(:user) { FactoryGirl.create(:user) }
-      before { sign_in user }
-
+      before do
+        visit signin_path
+        fill_in "Email",    with: user.email
+        fill_in "Password", with: user.password
+        click_button "Sign in"
+        # Sign in when not using Capybara as well.
+        cookies[:remember_token] = user.remember_token
+      end 
       it { should have_selector('title', text: user.name) }
 
       it { should have_link('Users',    href: users_path) }
@@ -79,8 +85,15 @@ describe "Authentication" do
     describe "as wrong user" do
       let(:user) { FactoryGirl.create(:user) }
       let(:wrong_user) { FactoryGirl.create(:user, email: "wrong@example.com") }
-      before { sign_in user }
-
+      before do
+        visit signin_path
+        fill_in "Email",    with: user.email
+        fill_in "Password", with: user.password
+        click_button "Sign in"
+        # Sign in when not using Capybara as well.
+        cookies[:remember_token] = user.remember_token
+      end 
+      
       describe "visiting Users#edit page" do
         before { visit edit_user_path(wrong_user) }
         it { should have_selector('title', text: full_title('Sample app')) }
